@@ -133,15 +133,12 @@ function handleUpdate(e) {
     return jsonResponse({ success: false, message: "Invalid JSON body" }, 400);
   }
 
-  const rowIndex = Number(payload.rowIndex);
+  let rowIndex = Number(payload.rowIndex);
+  const hasRowIndex = Number.isInteger(rowIndex) && rowIndex >= 2;
   const item = String(payload.item || "").trim();
   const quantity = Number(payload.quantity);
   const cost = Number(payload.cost);
   const boughtBy = String(payload.boughtBy || "").trim();
-
-  if (!rowIndex || rowIndex < 2 || !Number.isInteger(rowIndex)) {
-    return jsonResponse({ success: false, message: "Valid rowIndex is required" }, 400);
-  }
 
   if (!item) {
     return jsonResponse({ success: false, message: "Item is required" }, 400);
@@ -160,6 +157,14 @@ function handleUpdate(e) {
   }
 
   const sheet = getSheet();
+
+  if (!hasRowIndex) {
+    rowIndex = findRowIndexByOriginalItem(sheet, payload);
+    if (!rowIndex) {
+      return jsonResponse({ success: false, message: "Item not found for editing. Please refresh and try again." }, 404);
+    }
+  }
+
   const lastRow = sheet.getLastRow();
 
   if (rowIndex > lastRow) {
@@ -175,6 +180,41 @@ function handleUpdate(e) {
   sheet.getRange(rowIndex, 1, 1, 5).setValues([[timestamp, item, quantity, cost, boughtBy]]);
 
   return jsonResponse({ success: true });
+}
+
+function findRowIndexByOriginalItem(sheet, payload) {
+  const originalTimestamp = String(payload.originalTimestamp || "").trim();
+  const originalItem = String(payload.originalItem || "").trim();
+  const originalQuantity = Number(payload.originalQuantity);
+  const originalCost = Number(payload.originalCost);
+  const originalBoughtBy = String(payload.originalBoughtBy || "").trim();
+
+  if (!originalTimestamp || !originalItem || !originalBoughtBy) {
+    return null;
+  }
+
+  const values = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < values.length; i++) {
+    const row = values[i];
+    const rowTimestamp = formatTimestamp(row[0]);
+    const rowItem = String(row[1] || "").trim();
+    const rowQuantity = Number(row[2]) || 0;
+    const rowCost = Number(row[3]) || 0;
+    const rowBoughtBy = String(row[4] || "").trim();
+
+    if (
+      rowTimestamp === originalTimestamp &&
+      rowItem === originalItem &&
+      rowQuantity === originalQuantity &&
+      rowCost === originalCost &&
+      rowBoughtBy === originalBoughtBy
+    ) {
+      return i + 1;
+    }
+  }
+
+  return null;
 }
 
 function getSheet() {

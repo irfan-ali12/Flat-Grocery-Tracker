@@ -64,7 +64,8 @@ class GroceryProvider extends ChangeNotifier {
   }
 
   Future<bool> updateItem({
-    required int rowIndex,
+    int? rowIndex,
+    required GroceryItem originalItem,
     required String item,
     required int quantity,
     required double cost,
@@ -73,6 +74,11 @@ class GroceryProvider extends ChangeNotifier {
     try {
       final success = await _apiService.updateItem(
         rowIndex: rowIndex,
+        originalTimestamp: originalItem.timestamp,
+        originalItem: originalItem.item,
+        originalQuantity: originalItem.quantity,
+        originalCost: originalItem.cost,
+        originalBoughtBy: originalItem.boughtBy,
         item: item,
         quantity: quantity,
         cost: cost,

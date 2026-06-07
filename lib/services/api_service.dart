@@ -89,8 +89,16 @@ class ApiService {
       final body = _decodeJsonResponse(response);
 
       if (body['success'] != true) {
+        final message = body['message']?.toString() ?? 'Server returned an error';
+
+        if (message.toLowerCase().contains('unknown route: update')) {
+          throw ApiException(
+            'Edit is not available on the deployed backend yet. Redeploy the Google Apps Script web app and try again.',
+          );
+        }
+
         throw ApiException(
-          body['message']?.toString() ?? 'Server returned an error',
+          message,
         );
       }
 
@@ -161,7 +169,12 @@ class ApiService {
   }
 
   Future<bool> updateItem({
-    required int rowIndex,
+    int? rowIndex,
+    required String originalTimestamp,
+    required String originalItem,
+    required int originalQuantity,
+    required double originalCost,
+    required String originalBoughtBy,
     required String item,
     required int quantity,
     required double cost,
@@ -172,7 +185,12 @@ class ApiService {
         url: ApiConstants.updateUrl,
         method: 'POST',
         payload: {
-          'rowIndex': rowIndex,
+          if (rowIndex != null) 'rowIndex': rowIndex,
+          'originalTimestamp': originalTimestamp,
+          'originalItem': originalItem,
+          'originalQuantity': originalQuantity,
+          'originalCost': originalCost,
+          'originalBoughtBy': originalBoughtBy,
           'item': item,
           'quantity': quantity,
           'cost': cost,

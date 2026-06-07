@@ -65,14 +65,12 @@ class _AddItemScreenState extends State<AddItemScreen> {
       final payloadBoughtBy = _boughtByController.text.trim();
 
       if (_isEditMode) {
+        final originalItem = widget.itemToEdit!;
         final rowIndex = widget.itemToEdit?.rowIndex;
-
-        if (rowIndex == null) {
-          throw ApiException('Cannot edit this item because row index is missing.');
-        }
 
         await provider.updateItem(
           rowIndex: rowIndex,
+          originalItem: originalItem,
           item: payloadItem,
           quantity: payloadQuantity,
           cost: payloadCost,
@@ -114,7 +112,11 @@ class _AddItemScreenState extends State<AddItemScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Failed to add item. Please try again.'),
+          content: Text(
+            _isEditMode
+                ? 'Failed to update item. Please try again.'
+                : 'Failed to add item. Please try again.',
+          ),
           behavior: SnackBarBehavior.floating,
           backgroundColor: Theme.of(context).colorScheme.error,
         ),
