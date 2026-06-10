@@ -1,4 +1,4 @@
-const SPREADSHEET_ID = "1bIXdff1V6CQ74wdOtMq7lCtRbpPjowKgrfgH03UczOM";
+const SPREADSHEET_ID = "1gtBT4p8hHHhKVfhOZp1oygJyaMuP2LTEJzqZ33GCp3A";
 const SHEET_NAME = "Groceries";
 
 function doGet(e) {

@@ -56,7 +56,7 @@ const SPREADSHEET_ID = "YOUR_GOOGLE_SHEET_ID";
 with your actual spreadsheet ID, for example:
 
 ```javascript
-const SPREADSHEET_ID = "1abcDEFghiJKLmnopQRstuVWxyz1234567890";
+const SPREADSHEET_ID = "1gtBT4p8hHHhKVfhOZp1oygJyaMuP2LTEJzqZ33GCp3A";
 ```
 
 4. Click **Save** and name the project **Flat Grocery Tracker API**.
